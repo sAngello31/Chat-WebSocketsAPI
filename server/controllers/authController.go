@@ -17,7 +17,13 @@ func NewAuthController(userRepo *models.UserRepository) {
 }
 
 func (ctrl *AuthController) Login(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Te voy a loggear bitch",
-	})
+	ctrl.UserRepo.Login(c)
+}
+
+func (ctrl *AuthController) Register(c *gin.Context) {
+	ctrl.UserRepo.RegisterNewUser(c)
+}
+
+func (ctrl *AuthController) GetUsersController(c *gin.Context) {
+	ctrl.UserRepo.GetAllUser(c)
 }
