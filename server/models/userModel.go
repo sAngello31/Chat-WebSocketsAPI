@@ -53,12 +53,12 @@ func (ctrl *UserRepository) GetAllUser(c *gin.Context) []User {
 	filter := bson.D{}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
-		log.Fatal("Error: Bad Query ", err)
+		log.Println("Error: Bad Query ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error: Bad Query"})
 		return nil
 	}
 	if err = cursor.All(context.TODO(), &users); err != nil {
-		log.Fatal("Error, Decode Error", err)
+		log.Println("Error, Decode Error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al decodificar el documento MongoDB"})
 		return nil
 	}
