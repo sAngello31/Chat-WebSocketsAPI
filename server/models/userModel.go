@@ -15,11 +15,8 @@ import (
 type User struct {
 	ID            primitive.ObjectID `bson:"_id,omitempty"`
 	ContactNumber int32              `bson:"contact_number"`
-	Name          string             `bson:"name"`
-	LastName      string             `bson:"last_name"`
 	Username      string             `bson:"username"`
 	Password      string             `bson:"password"`
-	CreatedAt     string             `bson:"created_at"`
 }
 
 type UserRepository struct {
@@ -30,11 +27,17 @@ func NewUserRepository(client *mongo.Client) *UserRepository {
 	return &UserRepository{client: client}
 }
 
+func (ctrl *UserRepository) getUserCollection() *mongo.Collection {
+	return ctrl.client.Database(os.Getenv("NAME_DATABASE")).Collection(os.Getenv("NAME_USER_COLLECTION"))
+}
+
 func (ctrl *UserRepository) RegisterNewUser(c *gin.Context) {
-	log.Println("Se va a registar un nuevo usuario :D")
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Te voy a registar uwu",
-	})
+	isUnique := ctrl.isUniqueUsername(c.PostForm("username"))
+	if !isUnique {
+		log.Println("Este username está ocupado. StatusCode: ", http.StatusConflict)
+		c.String(http.StatusConflict, "El username está ocupado")
+	}
+
 }
 
 func (ctrl *UserRepository) Login(c *gin.Context) {
@@ -44,20 +47,35 @@ func (ctrl *UserRepository) Login(c *gin.Context) {
 	})
 }
 
-func (ctrl *UserRepository) GetAllUser(c *gin.Context) {
+func (ctrl *UserRepository) GetAllUser(c *gin.Context) []User {
 	var users []User
-	collection := ctrl.client.Database(os.Getenv("NAME_DATABASE")).Collection(os.Getenv("NAME_USER_COLLECTION"))
+	collection := ctrl.getUserCollection()
 	filter := bson.D{}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal("Error: Bad Query ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error: Bad Query"})
-		return
+		return nil
 	}
 	if err = cursor.All(context.TODO(), &users); err != nil {
 		log.Fatal("Error, Decode Error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al decodificar el documento MongoDB"})
-		return
+		return nil
 	}
-	c.JSON(http.StatusOK, users)
+	//c.JSON(http.StatusOK, users)
+	return users
+}
+
+// Considerar agregar un error como retorno para manejar otros errores de consultas
+func (ctrl *UserRepository) isUniqueUsername(username string) bool {
+	collection := ctrl.getUserCollection()
+	filter := bson.M{"username": username}
+	var user User
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return true
+		}
+	}
+	return false
 }
