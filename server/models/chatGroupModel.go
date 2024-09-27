@@ -1,6 +1,7 @@
 package models
 
 import (
+	"chat_websocket/services"
 	"context"
 	"log"
 	"net/http"
@@ -51,10 +52,17 @@ func (ctrl *ChatGroupRepository) GetAllChatsGroups(c *gin.Context) {
 }
 
 func (ctrl *ChatGroupRepository) InsertChatGroup(c *gin.Context) {
+	tokenString := c.GetHeader("Authorization")
+	userid, err := services.GetObjectIDFromJWT(tokenString)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Acceso no autorizado"})
+		return
+	}
 	chat := ChatGroupToSave{
 		Name:       c.PostForm("name"),
 		Created_At: time.Now().Format(time.RFC3339),
-		Created_By: primitive.NewObjectID(),
+		Created_By: userid,
 	}
 	collection := ctrl.GetChatCollection()
 	result, err := collection.InsertOne(context.TODO(), chat)
