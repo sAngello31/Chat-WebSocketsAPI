@@ -21,10 +21,9 @@ func SetupRoutes(router *gin.Engine) {
 	//Auth Routes
 	auth := router.Group("/auth")
 	{
-		auth.GET("/login", controllers.ThisAuthController.Login)
+		auth.POST("/login", controllers.ThisAuthController.Login)
 		auth.POST("/register", controllers.ThisAuthController.Register)
 		auth.POST("/logout")
-		auth.GET("/findAll", controllers.ThisAuthController.GetUsersController)
 	}
 
 }

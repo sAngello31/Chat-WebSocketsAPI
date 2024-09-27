@@ -23,7 +23,3 @@ func (ctrl *AuthController) Login(c *gin.Context) {
 func (ctrl *AuthController) Register(c *gin.Context) {
 	ctrl.UserRepo.RegisterNewUser(c)
 }
-
-func (ctrl *AuthController) GetUsersController(c *gin.Context) {
-	ctrl.UserRepo.GetAllUser(c)
-}

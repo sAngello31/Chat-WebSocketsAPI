@@ -31,6 +31,11 @@ type UserToSave struct {
 	CreatedAt     string
 }
 
+type UserToLogin struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 type UserRepository struct {
 	client *mongo.Client
 }
@@ -39,6 +44,7 @@ func NewUserRepository(client *mongo.Client) *UserRepository {
 	return &UserRepository{client: client}
 }
 
+// ------------- Register New User -------------------------
 // Refactorizar (dividir la logica)
 func (ctrl *UserRepository) RegisterNewUser(c *gin.Context) {
 	isUnique := ctrl.IsUniqueUsername(c.PostForm("username"))
@@ -70,19 +76,34 @@ func (ctrl *UserRepository) RegisterNewUser(c *gin.Context) {
 	c.String(http.StatusConflict, "Error al crear el nuevo usuario")
 }
 
-func (ctrl *UserRepository) saveUser(user UserToSave) *mongo.InsertOneResult {
-	collection := ctrl.getUserCollection()
-	result, err := collection.InsertOne(context.TODO(), user)
-	if err != nil {
-		log.Println("Error al guardar el nuevo usuario", err)
-	}
-	return result
-}
-
+// --------------------- Login User -------------------------
 func (ctrl *UserRepository) Login(c *gin.Context) {
-	log.Println("Se va a loggear un usuario :D")
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Te voy a loggear",
+	user, err := ctrl.GetUserByUsername(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Error al encontrar el usuario",
+		})
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(c.PostForm("password")))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Contraseña incorrecta",
+		})
+		return
+	}
+
+	token, err := services.GenerateJWT(user.ID)
+	if err != nil {
+		log.Println("Error al generar el JWT", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Error al generar JWT",
+		})
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"token": token,
 	})
 }
 
@@ -102,6 +123,28 @@ func (ctrl *UserRepository) GetAllUser(c *gin.Context) []User {
 		return nil
 	}
 	return users
+}
+
+// ----------------------- Operation with Database -------------------------
+
+func (ctrl *UserRepository) saveUser(user UserToSave) *mongo.InsertOneResult {
+	collection := ctrl.getUserCollection()
+	result, err := collection.InsertOne(context.TODO(), user)
+	if err != nil {
+		log.Println("Error al guardar el nuevo usuario", err)
+	}
+	return result
+}
+
+func (ctrl *UserRepository) GetUserByUsername(c *gin.Context) (User, error) {
+	collection := ctrl.getUserCollection()
+	filter := bson.M{"username": c.PostForm("username")}
+	var user User
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 // Considerar agregar un error como retorno para manejar otros errores de consultas
