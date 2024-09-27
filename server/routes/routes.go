@@ -29,6 +29,7 @@ func SetupRoutes(router *gin.Engine) {
 	chatGroup := router.Group("/chatgroup")
 	{
 		chatGroup.GET("/getAllChatGroups", controllers.ThisChatGroupController.GetAllChatsGroups)
+		chatGroup.POST("/insertChat", controllers.ThisChatGroupController.InsertChatGroup)
 	}
 
 }

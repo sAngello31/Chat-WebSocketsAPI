@@ -5,15 +5,23 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ChatGroup struct {
 	Name       string `bson:"name"`
 	Created_at string `bson:"created_at"`
+}
+
+type ChatGroupToSave struct {
+	Name       string
+	Created_At string
+	Created_By primitive.ObjectID
 }
 
 type ChatGroupRepository struct {
@@ -43,7 +51,18 @@ func (ctrl *ChatGroupRepository) GetAllChatsGroups(c *gin.Context) {
 }
 
 func (ctrl *ChatGroupRepository) InsertChatGroup(c *gin.Context) {
-
+	chat := ChatGroupToSave{
+		Name:       c.PostForm("name"),
+		Created_At: time.Now().Format(time.RFC3339),
+		Created_By: primitive.NewObjectID(),
+	}
+	collection := ctrl.GetChatCollection()
+	result, err := collection.InsertOne(context.TODO(), chat)
+	if err != nil {
+		log.Println("Error al insertar el nuevo chat: ", err)
+		return
+	}
+	c.JSON(http.StatusOK, result)
 }
 
 func (ctrl *ChatGroupRepository) GetChatCollection() *mongo.Collection {
