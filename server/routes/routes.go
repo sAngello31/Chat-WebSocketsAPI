@@ -26,4 +26,9 @@ func SetupRoutes(router *gin.Engine) {
 		auth.POST("/logout")
 	}
 
+	chatGroup := router.Group("/chatgroup")
+	{
+		chatGroup.GET("/getAllChatGroups", controllers.ThisChatGroupController.GetAllChatsGroups)
+	}
+
 }

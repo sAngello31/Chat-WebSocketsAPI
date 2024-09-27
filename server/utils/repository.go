@@ -8,6 +8,8 @@ import (
 func InitRepositories() {
 	//Repositories
 	userRepo := models.NewUserRepository(Client)
+	chatGroupRepo := models.NewChatGroupRepository(Client)
 	//Controllers
 	controllers.NewAuthController(userRepo)
+	controllers.NewChatGroupController(chatGroupRepo)
 }
