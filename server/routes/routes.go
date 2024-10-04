@@ -8,16 +8,6 @@ import (
 
 func SetupRoutes(router *gin.Engine) {
 
-	//Enrutamiento de Ejemplo
-	v1 := router.Group("/v1")
-	{
-		v1.GET("/ping", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"message": "pong",
-			})
-		})
-	}
-
 	//Auth Routes
 	auth := router.Group("/auth")
 	{
@@ -30,6 +20,11 @@ func SetupRoutes(router *gin.Engine) {
 	{
 		chatGroup.GET("/getAllChatGroups", controllers.ThisChatGroupController.GetAllChatsGroups)
 		chatGroup.POST("/insertChat", controllers.ThisChatGroupController.InsertChatGroup)
+	}
+
+	chat := router.Group("/chat")
+	{
+		chat.GET("connectTo", controllers.ThisChatController.InitChat)
 	}
 
 }

@@ -9,7 +9,9 @@ func InitRepositories() {
 	//Repositories
 	userRepo := models.NewUserRepository(Client)
 	chatGroupRepo := models.NewChatGroupRepository(Client)
+	MsgRepo := models.NewMsgRepository(Client)
 	//Controllers
 	controllers.NewAuthController(userRepo)
 	controllers.NewChatGroupController(chatGroupRepo)
+	controllers.NewChatController(MsgRepo)
 }
