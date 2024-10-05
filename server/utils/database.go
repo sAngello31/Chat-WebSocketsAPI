@@ -14,7 +14,9 @@ var Client *mongo.Client
 func InitDB() {
 	var err error
 	ctx := context.TODO()
-	clOptions := options.Client().ApplyURI(os.Getenv("HOST_DATABASE"))
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	urlDB := "mongodb+srv://" + os.Getenv("USER_DB") + ":" + os.Getenv("PASSWORD_DB") + "@chatwebsocketapi.uivjm.mongodb.net/?retryWrites=true&w=majority&appName=" + os.Getenv("APP_NAME_DB")
+	clOptions := options.Client().ApplyURI(urlDB).SetServerAPIOptions(serverAPI)
 	Client, err = mongo.Connect(ctx, clOptions)
 	if err != nil {
 		log.Fatal(err)

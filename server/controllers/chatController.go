@@ -17,11 +17,6 @@ type ChatController struct {
 
 var ThisChatController *ChatController
 
-var newUpgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
 func NewChatController(msgRepo *models.MsgRepository) {
 	ThisChatController = &ChatController{MsgRepo: msgRepo}
 }
@@ -35,7 +30,7 @@ func (ctrl *ChatController) InitChat(c *gin.Context) {
 		return
 	}
 	msgString := ("Conexion WebSocket. ID: " + token)
-	ws, err := newUpgrader.Upgrade(c.Writer, c.Request, nil)
+	ws, err := services.Upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("Error al conectar el websocket: ", err)
 		c.JSON(http.StatusBadRequest, "Error al conectar el websocket")
