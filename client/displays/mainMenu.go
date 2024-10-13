@@ -6,12 +6,20 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-var menuOptions = []string{"Iniciar Sesión", "Registrarse", "Salir de la Aplicación"}
+var MenuOptions = map[string]func(){
+	"Iniciar Sesión":         ShowLoginMenu,
+	"Registrarse":            func() {},
+	"Salir de la Aplicación": func() {},
+}
 
 func ShowMainMenu() string {
+	options := make([]string, 0, len(MenuOptions))
+	for option := range MenuOptions {
+		options = append(options, option)
+	}
 	prompt := promptui.Select{
 		Label: "Menú Principal",
-		Items: menuOptions,
+		Items: options,
 	}
 	_, result, err := prompt.Run()
 	if err != nil {

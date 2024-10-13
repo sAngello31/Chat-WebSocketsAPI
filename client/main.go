@@ -11,5 +11,10 @@ func main() {
 	utils.CleanScreen()
 	fmt.Println("\n\n\t\tCLI WebSocketAPI")
 	choice := displays.ShowMainMenu()
-	fmt.Println(choice)
+	action, ok := displays.MenuOptions[choice]
+	if ok {
+		action()
+	} else {
+		fmt.Println("Opcion Invalida")
+	}
 }
