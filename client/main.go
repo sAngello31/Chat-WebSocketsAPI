@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"main.go/displays"
+	"main.go/utils"
+)
 
 func main() {
-	fmt.Println("Hola, este es el cliente")
+	utils.CleanScreen()
+	fmt.Println("\n\n\t\tCLI WebSocketAPI")
+	choice := displays.ShowMainMenu()
+	fmt.Println(choice)
 }
