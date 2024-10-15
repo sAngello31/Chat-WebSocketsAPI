@@ -5,31 +5,16 @@ import (
 	"fmt"
 
 	"github.com/manifoldco/promptui"
+	"main.go/services"
+	"main.go/utils"
 )
 
 func ShowLoginMenu() {
-	user := GetUsername()
+	utils.InitDisplay("Iniciar Sesión")
+	user := utils.PrepareGetText("Username")
 	password := GetPassword()
-	fmt.Println(user, password)
-}
-
-func GetUsername() string {
-	validate := func(input string) error {
-		if input == "" {
-			return errors.New("username invalido")
-		}
-		return nil
-	}
-	prompt := promptui.Prompt{
-		Label:    "Username",
-		Validate: validate,
-	}
-	result, err := prompt.Run()
-	if err != nil {
-		fmt.Println("Username invalido")
-		return ""
-	}
-	return result
+	services.Login(user, password)
+	utils.Spinner(100)
 }
 
 func GetPassword() string {
