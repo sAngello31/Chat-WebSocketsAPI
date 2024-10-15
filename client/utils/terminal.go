@@ -1,9 +1,13 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/manifoldco/promptui"
 )
 
 var clear = make(map[string]func())
@@ -27,4 +31,33 @@ func CleanScreen() {
 	if ok {
 		value()
 	}
+}
+
+func WriteTitle() {
+	fmt.Println("\n\n\t\tCLI WebSocketAPI")
+}
+
+func InitDisplay(title string) {
+	CleanScreen()
+	fmt.Println("\n\t\t" + title)
+}
+
+func PrepareGetText(cred string) string {
+	validate := func(input string) error {
+		if input == "" {
+			err := cred + " invalido"
+			return errors.New(err)
+		}
+		return nil
+	}
+	prompt := promptui.Prompt{
+		Label:    cred,
+		Validate: validate,
+	}
+	result, err := prompt.Run()
+	if err != nil {
+		fmt.Println(cred + " invalido")
+		return ""
+	}
+	return result
 }
