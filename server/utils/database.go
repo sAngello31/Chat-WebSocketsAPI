@@ -11,13 +11,12 @@ import (
 
 var Client *mongo.Client
 
-func InitDB() {
+func ConnectDB() {
 	var err error
-	ctx := context.TODO()
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	urlDB := "mongodb+srv://" + os.Getenv("USER_DB") + ":" + os.Getenv("PASSWORD_DB") + "@chatwebsocketapi.uivjm.mongodb.net/?retryWrites=true&w=majority&appName=" + os.Getenv("APP_NAME_DB")
-	clOptions := options.Client().ApplyURI(urlDB).SetServerAPIOptions(serverAPI)
-	Client, err = mongo.Connect(ctx, clOptions)
+	db_opts := options.Client().ApplyURI(urlDB).SetMaxPoolSize(10).SetServerAPIOptions(serverAPI)
+	Client, err = mongo.Connect(context.TODO(), db_opts)
 	if err != nil {
 		log.Fatal(err)
 	}

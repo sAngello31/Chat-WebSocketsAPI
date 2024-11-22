@@ -1,6 +1,5 @@
 package main
 
-//1-888-420-9943
 import (
 	"chat_websocket/routes"
 	"chat_websocket/utils"
@@ -10,9 +9,8 @@ import (
 
 func main() {
 	utils.LoadEnv()
-	utils.InitDB()
+	utils.ConnectDB()
 	defer utils.CloseDB()
-	utils.InitRepositories()
 	r := gin.Default()
 	routes.SetupRoutes(r)
 	r.Run()
