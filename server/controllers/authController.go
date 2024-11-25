@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"chat_websocket/models"
+	"chat_websocket/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,9 +18,9 @@ func NewAuthController(userRepo *models.UserRepository) {
 }
 
 func (ctrl *AuthController) Login(c *gin.Context) {
-	ctrl.UserRepo.Login(c)
+	//ctrl.UserRepo.Login(c)
 }
 
-func (ctrl *AuthController) Register(c *gin.Context) {
-	ctrl.UserRepo.RegisterNewUser(c)
+func RegisterNewUser(c *gin.Context) {
+	services.RegisterUser(c)
 }

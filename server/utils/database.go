@@ -23,6 +23,10 @@ func ConnectDB() {
 	log.Println("Database is connected")
 }
 
+func GetCollection(collection string) *mongo.Collection {
+	return Client.Database(os.Getenv("NAME_DATABASE")).Collection(collection)
+}
+
 func CloseDB() {
 	ctx := context.TODO()
 	err := Client.Disconnect(ctx)

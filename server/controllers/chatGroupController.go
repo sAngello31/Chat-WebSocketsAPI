@@ -17,9 +17,9 @@ func NewChatGroupController(chatGroup *models.ChatGroupRepository) {
 }
 
 func (ctrl *ChatGroupController) GetAllChatsGroups(c *gin.Context) {
-	ctrl.ChatGroupRepo.GetAllChatsGroups(c)
+	//ctrl.ChatGroupRepo.GetAllChatsGroups(c)
 }
 
 func (ctrl *ChatGroupController) InsertChatGroup(c *gin.Context) {
-	ctrl.ChatGroupRepo.InsertChatGroup(c)
+	//ctrl.ChatGroupRepo.InsertChatGroup(c)
 }

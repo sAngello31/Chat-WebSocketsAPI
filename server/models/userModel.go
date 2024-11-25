@@ -1,18 +1,13 @@
 package models
 
 import (
-	"chat_websocket/services"
-	"context"
+	"crypto/rand"
 	"log"
-	"net/http"
-	"os"
-	"time"
+	"math/big"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -20,20 +15,6 @@ type User struct {
 	ContactNumber int64              `bson:"contact_number"`
 	Username      string             `bson:"username"`
 	Password      string             `bson:"password"`
-}
-
-type UserToSave struct {
-	ContactNumber int64
-	Name          string
-	LastName      string
-	Username      string
-	Password      string
-	CreatedAt     string
-}
-
-type UserToLogin struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
 }
 
 type UserRepository struct {
@@ -44,37 +25,27 @@ func NewUserRepository(client *mongo.Client) *UserRepository {
 	return &UserRepository{client: client}
 }
 
+func CreateUser(c *gin.Context, password string) User {
+	return User{
+		ContactNumber: createRandUserCode(),
+		Username:      c.PostForm("username"),
+		Password:      password,
+	}
+}
+
+func createRandUserCode() int64 {
+	nBig, err := rand.Int(rand.Reader, big.NewInt(900000))
+	if err != nil {
+		log.Println("Error: Seed does not generate")
+		return 0
+	}
+	return nBig.Int64() + 100000
+}
+
+/*
+
 // ------------- Register New User -------------------------
 // Refactorizar (dividir la logica)
-func (ctrl *UserRepository) RegisterNewUser(c *gin.Context) {
-	isUnique := ctrl.IsUniqueUsername(c.PostForm("username"))
-	if !isUnique {
-		log.Println("Este username está ocupado. StatusCode: ", http.StatusConflict)
-		c.String(http.StatusConflict, "El username está ocupado") // Cambiar de acuerdo al cliente
-		return
-	}
-	passwordHashed, err := bcrypt.GenerateFromPassword([]byte(c.PostForm("password")), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println("Error: Hashing error ", err)
-		c.String(http.StatusConflict, "Error al cifrar la contraseña")
-		return
-	}
-	userForSaving := UserToSave{
-		ContactNumber: services.CreateRandomUserCode(),
-		Name:          c.PostForm("name"),
-		LastName:      c.PostForm("last_name"),
-		Username:      c.PostForm("username"),
-		Password:      string(passwordHashed),
-		CreatedAt:     time.Now().Format(time.RFC3339),
-	}
-	result := ctrl.saveUser(userForSaving)
-	if result != nil {
-		log.Println("Nuevo Usuario Creado Correctamente: ", result)
-		c.JSON(http.StatusCreated, result)
-		return
-	}
-	c.String(http.StatusConflict, "Error al crear el nuevo usuario")
-}
 
 // --------------------- Login User -------------------------
 func (ctrl *UserRepository) Login(c *gin.Context) {
@@ -147,9 +118,15 @@ func (ctrl *UserRepository) GetUserByUsername(c *gin.Context) (User, error) {
 	return user, nil
 }
 
-// Considerar agregar un error como retorno para manejar otros errores de consultas
-func (ctrl *UserRepository) IsUniqueUsername(username string) bool {
-	collection := ctrl.getUserCollection()
+func (ctrl *UserRepository) getUserCollection() *mongo.Collection {
+	return ctrl.client.Database(os.Getenv("NAME_DATABASE")).Collection(os.Getenv("NAME_USER_COLLECTION"))
+}
+
+// REFACTORING
+
+
+func IsUniqueUsername(username string) bool {
+	collection := utils.GetCollection("users")
 	filter := bson.M{"username": username}
 	var user User
 	err := collection.FindOne(context.TODO(), filter).Decode(&user)
@@ -160,7 +137,4 @@ func (ctrl *UserRepository) IsUniqueUsername(username string) bool {
 	}
 	return false
 }
-
-func (ctrl *UserRepository) getUserCollection() *mongo.Collection {
-	return ctrl.client.Database(os.Getenv("NAME_DATABASE")).Collection(os.Getenv("NAME_USER_COLLECTION"))
-}
+*/

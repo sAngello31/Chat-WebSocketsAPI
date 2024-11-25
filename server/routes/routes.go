@@ -12,7 +12,7 @@ func SetupRoutes(router *gin.Engine) {
 	auth := router.Group("/auth")
 	{
 		auth.POST("/login", controllers.ThisAuthController.Login)
-		auth.POST("/register", controllers.ThisAuthController.Register)
+		auth.POST("/register", controllers.RegisterNewUser)
 		auth.POST("/logout")
 	}
 

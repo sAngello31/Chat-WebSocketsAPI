@@ -1,15 +1,6 @@
 package models
 
 import (
-	"chat_websocket/services"
-	"context"
-	"log"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -32,6 +23,8 @@ type ChatGroupRepository struct {
 func NewChatGroupRepository(client *mongo.Client) *ChatGroupRepository {
 	return &ChatGroupRepository{client: client}
 }
+
+/*
 
 func (ctrl *ChatGroupRepository) GetAllChatsGroups(c *gin.Context) {
 	collection := ctrl.GetChatCollection()
@@ -76,3 +69,4 @@ func (ctrl *ChatGroupRepository) InsertChatGroup(c *gin.Context) {
 func (ctrl *ChatGroupRepository) GetChatCollection() *mongo.Collection {
 	return ctrl.client.Database(os.Getenv("NAME_DATABASE")).Collection(os.Getenv("NAME_CHATS_COLLECTION"))
 }
+*/
