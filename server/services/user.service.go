@@ -37,12 +37,32 @@ func RegisterUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"StatusCode": http.StatusOK,
-		"ResultCode": result,
+		"InsertedID": result.InsertedID,
 	})
 }
 
+func LoginUser(c *gin.Context) {
+	user, err := getUserByUsername(c.PostForm("username"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(c.PostForm("password")))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+		return
+	}
+	token, err := GenerateJWT(user)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"Access_Token": token})
+}
+
 func saveUser(user *models.User) (*mongo.InsertOneResult, error) {
-	collection := utils.GetCollection("user")
+	collection := utils.GetCollection("users")
 	result, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		return nil, err
@@ -50,16 +70,27 @@ func saveUser(user *models.User) (*mongo.InsertOneResult, error) {
 	return result, nil
 }
 
-func isUniqueUsername(username string) bool {
+func getUserByUsername(username string) (models.User, error) {
 	collection := utils.GetCollection("users")
-	filter := bson.M{"username": username}
 	var user models.User
+	filter := bson.M{"username": username}
 	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		log.Println(err)
-		if err == mongo.ErrNilDocument {
-			return true
-		}
+		return user, err
 	}
-	return false
+	return user, nil
+}
+
+func isUniqueUsername(username string) bool {
+	collection := utils.GetCollection("users")
+	filter := bson.M{"username": username}
+	count, err := collection.CountDocuments(context.TODO(), filter)
+
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return count == 0
 }

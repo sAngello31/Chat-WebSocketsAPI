@@ -11,7 +11,7 @@ func SetupRoutes(router *gin.Engine) {
 	//Auth Routes
 	auth := router.Group("/auth")
 	{
-		auth.POST("/login", controllers.ThisAuthController.Login)
+		auth.POST("/login", controllers.Login)
 		auth.POST("/register", controllers.RegisterNewUser)
 		auth.POST("/logout")
 	}

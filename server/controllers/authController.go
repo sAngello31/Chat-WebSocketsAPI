@@ -17,8 +17,8 @@ func NewAuthController(userRepo *models.UserRepository) {
 	ThisAuthController = &AuthController{UserRepo: userRepo}
 }
 
-func (ctrl *AuthController) Login(c *gin.Context) {
-	//ctrl.UserRepo.Login(c)
+func Login(c *gin.Context) {
+	services.LoginUser(c)
 }
 
 func RegisterNewUser(c *gin.Context) {
