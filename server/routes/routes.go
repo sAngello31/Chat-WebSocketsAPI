@@ -8,7 +8,6 @@ import (
 
 func SetupRoutes(router *gin.Engine) {
 
-	//Auth Routes
 	auth := router.Group("/auth")
 	{
 		auth.POST("/login", controllers.Login)
@@ -16,10 +15,9 @@ func SetupRoutes(router *gin.Engine) {
 		auth.POST("/logout")
 	}
 
-	chatGroup := router.Group("/chatgroup")
+	user := router.Group("/user")
 	{
-		chatGroup.GET("/getAllChatGroups", controllers.ThisChatGroupController.GetAllChatsGroups)
-		chatGroup.POST("/insertChat", controllers.ThisChatGroupController.InsertChatGroup)
+		user.GET("/getAll", controllers.GetAllUsers)
 	}
 
 	chat := router.Group("/chat")

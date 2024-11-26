@@ -61,6 +61,25 @@ func LoginUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"Access_Token": token})
 }
 
+func GetAllUsers(c *gin.Context) {
+	collection := utils.GetCollection("users")
+	filter := bson.D{}
+	var userList []models.User
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+		return
+	}
+	if err = cursor.All(context.TODO(), &userList); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": userList})
+}
+
 func saveUser(user *models.User) (*mongo.InsertOneResult, error) {
 	collection := utils.GetCollection("users")
 	result, err := collection.InsertOne(context.TODO(), user)

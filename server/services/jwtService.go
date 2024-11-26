@@ -13,9 +13,10 @@ import (
 
 func GenerateJWT(user models.User) (string, error) {
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":       user.ID.Hex(),
-		"username": user.Username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"id":             user.ID.Hex(),
+		"username":       user.Username,
+		"contact_number": user.ContactNumber,
+		"exp":            time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	token, err := generateToken.SignedString([]byte(os.Getenv("STRING_TOKEN")))
