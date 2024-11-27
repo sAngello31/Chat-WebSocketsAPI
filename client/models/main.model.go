@@ -7,14 +7,19 @@ import (
 )
 
 type MainModel struct {
-	Title   string
-	Choices []string
-	Cursor  int
+	Title          string
+	Choices        map[string]tea.Model
+	ChoicesDisplay []string
+	Cursor         int
 }
 
 func InitModel() MainModel {
-	choices := []string{"Iniciar Sesion", "Registrarse", "Salir de la Aplicacion"}
-	return MainModel{Title: "Real-Time Chat App with WebSockets", Choices: choices}
+	choices := []string{"Iniciar Sesión", "Registrar Nuevo Usuario", "Salir de la App"}
+	choiceMap := make(map[string]tea.Model, len(choices))
+	choiceMap[choices[0]] = InitLoginModel()
+	choiceMap[choices[1]] = InitRegisterModel()
+	choiceMap[choices[2]] = InitExitModel()
+	return MainModel{Title: "Real-Time Chat App with WebSockets", Choices: choiceMap, ChoicesDisplay: choices}
 }
 
 func (m MainModel) Init() tea.Cmd {
@@ -33,8 +38,8 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.Cursor < len(m.Choices)-1 {
 				m.Cursor += 1
 			}
-		case "q":
-			return m, tea.Quit
+		case "enter":
+			return m.Choices[m.ChoicesDisplay[m.Cursor]], nil
 		}
 	}
 	return m, nil
@@ -42,7 +47,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m MainModel) View() string {
 	s := m.Title + "\nMenu principal:\n\n"
-	for i, choice := range m.Choices {
+	for i, choice := range m.ChoicesDisplay {
 		cursor := " "
 		if m.Cursor == i {
 			cursor = ">"
