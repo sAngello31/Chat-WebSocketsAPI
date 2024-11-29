@@ -14,9 +14,17 @@ func (m LoginModel) Init() tea.Cmd {
 }
 
 func (m LoginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return nil, nil
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			return m, tea.Quit
+		}
+
+	}
+	return m, nil
 }
 
 func (m LoginModel) View() string {
-	return ""
+	return "Login"
 }
