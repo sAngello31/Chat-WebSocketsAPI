@@ -11,11 +11,13 @@ import (
 type RegisterModel struct {
 	FocusIndex int
 	Inputs     []textinput.Model
+	BoolInputs []bool
 }
 
 func InitRegisterModel() RegisterModel {
 	m := RegisterModel{
-		Inputs: make([]textinput.Model, 3),
+		Inputs:     make([]textinput.Model, 3),
+		BoolInputs: make([]bool, 3),
 	}
 	var t textinput.Model
 
@@ -75,6 +77,9 @@ func (m RegisterModel) View() string {
 	b.WriteString("Registar Nuevo Usuario\n")
 	for i := range m.Inputs {
 		b.WriteString(m.Inputs[i].View())
+		if !m.BoolInputs[i] {
+			b.WriteString(colors.ErrorStyle.Render(" (Falta de Completar)"))
+		}
 		b.WriteRune('\n')
 	}
 
@@ -89,6 +94,11 @@ func (m RegisterModel) updateInputs(msg tea.Msg) tea.Cmd {
 	cmds := make([]tea.Cmd, len(m.Inputs))
 	for i := range m.Inputs {
 		m.Inputs[i], cmds[i] = m.Inputs[i].Update(msg)
+		if len(m.Inputs[i].Value()) > 0 {
+			m.BoolInputs[i] = true
+		} else {
+			m.BoolInputs[i] = false
+		}
 	}
 	return tea.Batch(cmds...)
 }
