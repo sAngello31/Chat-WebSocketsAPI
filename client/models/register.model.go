@@ -56,9 +56,9 @@ func (m RegisterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			return InitModel(), nil
 		case "up", "down":
-			if m.FocusIndex > 0 || msg.String() == "up" {
+			if m.FocusIndex > 0 && msg.String() == "up" {
 				m.FocusIndex--
-			} else if m.FocusIndex < len(m.Inputs) || msg.String() == "down" {
+			} else if m.FocusIndex < len(m.Inputs)-1 && msg.String() == "down" {
 				m.FocusIndex++
 			}
 
