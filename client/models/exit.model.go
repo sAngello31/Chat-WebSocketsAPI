@@ -15,16 +15,13 @@ func (m ExitModel) Init() tea.Cmd {
 }
 
 func (m ExitModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
+	switch msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "q":
-			return m, tea.Quit
-		}
+		return m, tea.Quit
 	}
 	return m, nil
 }
 
 func (m ExitModel) View() string {
-	return m.Message + "\nPresione 'q' para salir"
+	return m.Message + "\nPresione cualquier tecla para para salir"
 }
