@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -46,13 +46,16 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m MainModel) View() string {
-	s := m.Title + "\nMenu principal:\n\n"
+	var b strings.Builder
+	b.WriteString("\nMenu Principal:\n\n")
 	for i, choice := range m.ChoicesDisplay {
 		cursor := " "
 		if m.Cursor == i {
 			cursor = ">"
 		}
-		s += fmt.Sprintf("%s %s\n", cursor, choice)
+		b.WriteString(cursor)
+		b.WriteString(" " + choice)
+		b.WriteRune('\n')
 	}
-	return s
+	return b.String()
 }

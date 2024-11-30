@@ -27,16 +27,16 @@ func InitRegisterModel() RegisterModel {
 		t.CharLimit = 32
 		switch i {
 		case 0:
-			t.Placeholder = "Nickname"
+			t.Placeholder = "Nickname*"
 			t.Focus()
 			t.PromptStyle = colors.FocusedStyle
 			t.TextStyle = colors.FocusedStyle
 		case 1:
-			t.Placeholder = "Password"
+			t.Placeholder = "Password*"
 			t.EchoMode = textinput.EchoPassword
 			t.EchoCharacter = '*'
 		case 2:
-			t.Placeholder = "Repeat Password"
+			t.Placeholder = "Repeat Password*"
 			t.EchoMode = textinput.EchoPassword
 			t.EchoCharacter = '*'
 		}
@@ -78,7 +78,7 @@ func (m RegisterModel) View() string {
 	for i := range m.Inputs {
 		b.WriteString(m.Inputs[i].View())
 		if !m.BoolInputs[i] {
-			b.WriteString(colors.ErrorStyle.Render(" (Falta de Completar)"))
+			b.WriteString(colors.ErrorStyle.Render(" (Obligatorio)"))
 		}
 		b.WriteRune('\n')
 	}
