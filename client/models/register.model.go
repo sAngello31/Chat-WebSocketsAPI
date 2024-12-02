@@ -65,7 +65,7 @@ func (m RegisterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.FocusIndex++
 			}
 
-			cmd := m.updateCursor()
+			cmd := utilsmodel.UpdateCursor(&m.Inputs, m.FocusIndex)
 			return m, cmd
 		}
 	}
@@ -90,23 +90,6 @@ func (m RegisterModel) updateInputs(msg tea.Msg) tea.Cmd {
 		} else {
 			m.BoolInputs[i] = false
 		}
-	}
-	return tea.Batch(cmds...)
-}
-
-func (m RegisterModel) updateCursor() tea.Cmd {
-	cmds := make([]tea.Cmd, len(m.Inputs))
-	for i := range m.Inputs {
-		if i == m.FocusIndex {
-			cmds[i] = m.Inputs[i].Focus()
-			m.Inputs[i].PromptStyle = colors.FocusedStyle
-			m.Inputs[i].TextStyle = colors.FocusedStyle
-			continue
-		}
-		m.Inputs[i].Blur()
-		m.Inputs[i].PromptStyle = colors.NoStyle
-		m.Inputs[i].TextStyle = colors.NoStyle
-
 	}
 	return tea.Batch(cmds...)
 }

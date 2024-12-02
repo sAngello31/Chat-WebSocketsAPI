@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 /*
@@ -26,4 +27,20 @@ func PrintInputs(inputs *[]textinput.Model, bool_inputs *[]bool) string {
 	b.WriteRune('\n')
 	b.WriteString(colors.BlurStyle.Render("Presiona 'enter' para aceptar"))
 	return b.String()
+}
+
+func UpdateCursor(inputs *[]textinput.Model, cursor int) tea.Cmd {
+	cmds := make([]tea.Cmd, len(*inputs))
+	for i := range *inputs {
+		if i == cursor {
+			cmds[i] = (*inputs)[i].Focus()
+			(*inputs)[i].PromptStyle = colors.FocusedStyle
+			(*inputs)[i].TextStyle = colors.FocusedStyle
+			continue
+		}
+		(*inputs)[i].Blur()
+		(*inputs)[i].PromptStyle = colors.NoStyle
+		(*inputs)[i].TextStyle = colors.NoStyle
+	}
+	return tea.Batch(cmds...)
 }
