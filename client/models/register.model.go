@@ -2,6 +2,7 @@ package models
 
 import (
 	"client_websockets/colors"
+	utilsmodel "client_websockets/models/utilsModel"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -75,18 +76,8 @@ func (m RegisterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m RegisterModel) View() string {
 	var b strings.Builder
 	b.WriteString("Registar Nuevo Usuario\n")
-	for i := range m.Inputs {
-		b.WriteString(m.Inputs[i].View())
-		if !m.BoolInputs[i] {
-			b.WriteString(colors.ErrorStyle.Render(" (Obligatorio)"))
-		}
-		b.WriteRune('\n')
-	}
-
-	b.WriteRune('\n')
-	b.WriteString(colors.BlurStyle.Render("Presiona 'esc' para retroceder"))
-	b.WriteRune('\n')
-	b.WriteString(colors.BlurStyle.Render("Presiona 'enter' para aceptar"))
+	s := utilsmodel.PrintInputs(&m.Inputs, &m.BoolInputs)
+	b.WriteString(s)
 	return b.String()
 }
 
