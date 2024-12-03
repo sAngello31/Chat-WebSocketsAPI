@@ -7,6 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetUUIDUsers(c *gin.Context) {
+
+	userA := c.Param("userA")
+	userB := c.Param("userB")
+
+	if userA == "" || userB == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
+		return
+	}
+	s := services.GenerateUUID(userA, userB)
+	c.JSON(http.StatusOK, gin.H{"message": s})
+}
+
 func InitChat(c *gin.Context) {
 	/*
 		msgString := ("Conexion WebSocket. ID: " + token)
@@ -23,6 +36,6 @@ func InitChat(c *gin.Context) {
 			time.Sleep(time.Second)
 		}
 	*/
-	s := services.GenerateUUID(32, 21342)
+	s := services.GenerateUUID("", "")
 	c.JSON(http.StatusOK, gin.H{"message": s})
 }
