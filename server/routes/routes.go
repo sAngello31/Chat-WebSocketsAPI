@@ -22,7 +22,7 @@ func SetupRoutes(router *gin.Engine) {
 
 	chat := router.Group("/chat")
 	{
-		chat.GET("connectTo", controllers.ThisChatController.InitChat)
+		chat.GET("/connectTo", controllers.ThisChatController.InitChat)
 	}
 
 }
