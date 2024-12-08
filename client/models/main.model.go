@@ -47,6 +47,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m MainModel) View() string {
 	var b strings.Builder
+	b.WriteString(m.Title)
 	b.WriteString("\nMenu Principal:\n\n")
 	for i, choice := range m.ChoicesDisplay {
 		cursor := " "
