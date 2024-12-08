@@ -1,6 +1,11 @@
 package services
 
-import "github.com/gorilla/websocket"
+import (
+	"bytes"
+	"log"
+
+	"github.com/gorilla/websocket"
+)
 
 type ChatClient struct {
 	Hub  *Hub
@@ -10,16 +15,30 @@ type ChatClient struct {
 }
 
 func NewClient(uuid string, conn *websocket.Conn) *ChatClient {
-	return &ChatClient{
+	client := ChatClient{
 		Hub:  GetHub(),
 		Conn: conn,
 		UUID: uuid,
 		Send: make(chan []byte),
 	}
+	client.Hub.Register <- &client
+	return &client
+
 }
 
-// Revisar cual es el mejor
+func (c *ChatClient) ReadMsg() {
+	defer c.CloseClient()
+	for {
+		_, msg, err := c.Conn.ReadMessage()
+		if err != nil {
+			log.Println(err)
+			break
+		}
+		msg = bytes.TrimSpace(bytes.Replace(msg, []byte("\n"), []byte(" "), -1))
+		c.Hub.Broadcast <- msg
+	}
+}
+
 func (c *ChatClient) CloseClient() {
 	c.Hub.Unregister <- c
-	c.Conn.Close()
 }

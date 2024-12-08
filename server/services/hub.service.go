@@ -25,7 +25,7 @@ func NewHub() *Hub {
 }
 
 func (h *Hub) Run() {
-	log.Println("Ejecución del servicio HUB")
+	log.Println("Ejecución del servicio Hub")
 	for {
 		select {
 		case client := <-h.Register:
@@ -37,6 +37,7 @@ func (h *Hub) Run() {
 			for client := range h.Clients {
 				err := client.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
 				if err != nil {
+					log.Println("error: ", err)
 					h.Unregister <- client
 				}
 			}

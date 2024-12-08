@@ -2,12 +2,10 @@ package controllers
 
 import (
 	"chat_websocket/services"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 )
 
 func GetUUIDUsers(c *gin.Context) {
@@ -30,8 +28,8 @@ func HandleConn(c *gin.Context) {
 		log.Println("Error: Websocket")
 		return
 	}
-	defer conn.Close()
-	s := fmt.Sprint(c.Keys["username"], " se ha conectado al chat")
-	conn.WriteMessage(websocket.TextMessage, []byte(s))
+	newClient := services.NewClient(c.Param("uuid"), conn)
+	log.Println(newClient.Hub.Clients)
+	go newClient.ReadMsg()
 
 }
