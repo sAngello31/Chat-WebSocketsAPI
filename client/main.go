@@ -11,6 +11,7 @@ import (
 
 func main() {
 	utils.CleanScreen()
+	utils.LoadEnv()
 	p := tea.NewProgram(models.InitModel())
 	_, err := p.Run()
 	if err != nil {
