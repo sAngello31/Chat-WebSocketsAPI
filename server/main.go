@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	go services.NewHub().Run()
+	go services.InitHub()
 	utils.LoadEnv()
 	utils.ConnectDB()
 	defer utils.CloseDB()
