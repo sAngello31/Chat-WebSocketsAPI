@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func GenerateJWT(user models.User) (string, error) {
@@ -26,9 +25,9 @@ func GenerateJWT(user models.User) (string, error) {
 	return token, nil
 }
 
-func ValidJWT(token string) (jwt.Token, error) {
+func ValidJWT(token string) (*jwt.Token, error) {
 	if token == "" {
-		return jwt.Token{}, fmt.Errorf("error: missing JWT")
+		return &jwt.Token{}, fmt.Errorf("error: missing JWT")
 	}
 	tokenString := strings.TrimPrefix(token, "Bearer ")
 	realToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -39,32 +38,29 @@ func ValidJWT(token string) (jwt.Token, error) {
 	})
 
 	if err != nil || !realToken.Valid {
-		return *realToken, fmt.Errorf("unexpected signing method: %v", realToken.Header["alg"])
+		return realToken, fmt.Errorf("unexpected signing method: %v", realToken.Header["alg"])
 	}
-	return *realToken, nil
+	return realToken, nil
 }
 
-func GetIDFromJWT(tokenString string) (string, error) {
-	token, err := ValidJWT(tokenString)
-	if err != nil {
-		return "", err
-	}
-
+func GetStringDataFromJWT(token *jwt.Token, data string) string {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims["id"].(string), nil
+		return claims[data].(string)
 	}
-
-	return "", fmt.Errorf("error: Token expirado o invalido")
+	return ""
 }
 
-func GetObjectIDFromJWT(tokenString string) (primitive.ObjectID, error) {
-	token, err := GetIDFromJWT(tokenString)
-	if err != nil {
-		return primitive.NilObjectID, err
+func GetNumericalDataFromJWT(token *jwt.Token, data string) float64 {
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims[data].(float64)
 	}
-	objectToken, err := primitive.ObjectIDFromHex(token)
-	if err != nil {
-		return primitive.NilObjectID, err
-	}
-	return objectToken, nil
+	return 0
+}
+
+func GetUserData(token *jwt.Token) map[string]any {
+	data := make(map[string]any, 3)
+	data["user_id"] = GetStringDataFromJWT(token, "id")
+	data["username"] = GetStringDataFromJWT(token, "username")
+	data["contact_number"] = GetNumericalDataFromJWT(token, "contact_number")
+	return data
 }

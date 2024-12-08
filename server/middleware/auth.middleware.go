@@ -37,12 +37,16 @@ func JWTMiddleware(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	token_id, err := services.GetObjectIDFromJWT(authHeader) // Cambiar por la logica de negocios, que no sea un ObjectID como se maneje la aplicación
+
+	token, err := services.ValidJWT(authHeader)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
 		c.Abort()
 		return
 	}
-	c.Set("user_id", token_id)
+	data := services.GetUserData(token)
+	c.Set("user_id", data["user_id"])
+	c.Set("username", data["username"])
+	c.Set("contact_number", data["contact_number"])
 	c.Next()
 }
