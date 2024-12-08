@@ -23,7 +23,7 @@ func SetupRoutes(router *gin.Engine) {
 	chat := router.Group("/chat")
 	{
 		chat.GET("/getUUID/:userA/:userB", controllers.GetUUIDUsers)
-		chat.GET("/connectTo/:uuid", controllers.InitChat)
+		chat.GET("/connectTo/:uuid", controllers.HandleConn)
 	}
 
 }

@@ -2,9 +2,12 @@ package controllers
 
 import (
 	"chat_websocket/services"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 func GetUUIDUsers(c *gin.Context) {
@@ -20,22 +23,15 @@ func GetUUIDUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": s})
 }
 
-func InitChat(c *gin.Context) {
-	/*
-		msgString := ("Conexion WebSocket. ID: " + token)
-		ws, err := services.Upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			log.Println("Error al conectar el websocket: ", err)
-			c.JSON(http.StatusBadRequest, "Error al conectar el websocket")
-			return
-		}
-		defer ws.Close()
-		for {
+func HandleConn(c *gin.Context) {
+	upgrader := services.GetUpgrader()
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		log.Println("Error: Websocket")
+		return
+	}
+	defer conn.Close()
+	s := fmt.Sprint(c.Keys["username"], " se ha conectado al chat")
+	conn.WriteMessage(websocket.TextMessage, []byte(s))
 
-			ws.WriteMessage(websocket.TextMessage, []byte(msgString))
-			time.Sleep(time.Second)
-		}
-	*/
-	s := services.GenerateUUID("", "")
-	c.JSON(http.StatusOK, gin.H{"message": s})
 }
