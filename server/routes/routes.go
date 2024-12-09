@@ -18,6 +18,7 @@ func SetupRoutes(router *gin.Engine) {
 	user := router.Group("/user")
 	{
 		user.GET("/getAll", controllers.GetAllUsers)
+		user.GET("/data", controllers.GetUserData)
 	}
 
 	chat := router.Group("/chat")
