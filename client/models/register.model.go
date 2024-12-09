@@ -2,7 +2,9 @@ package models
 
 import (
 	"client_websockets/colors"
+	modeldata "client_websockets/model_data"
 	utilsmodel "client_websockets/models/utilsModel"
+	"client_websockets/services"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -57,7 +59,7 @@ func (m RegisterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc":
 			return InitModel(), nil
 		case "enter":
-			return InitModel(), nil
+			return m.enterRegister(), nil
 		case "up", "down":
 			if m.FocusIndex > 0 && msg.String() == "up" {
 				m.FocusIndex--
@@ -92,4 +94,19 @@ func (m RegisterModel) updateInputs(msg tea.Msg) tea.Cmd {
 		}
 	}
 	return tea.Batch(cmds...)
+}
+
+func (m RegisterModel) enterRegister() tea.Model {
+	if m.Inputs[1].Value() != m.Inputs[2].Value() {
+		return m
+	}
+	data := modeldata.UserLogin{
+		Username: m.Inputs[0].Value(),
+		Password: m.Inputs[1].Value(),
+	}
+	status := services.Register(&data)
+	if status != 200 {
+		return m
+	}
+	return InitModel()
 }
