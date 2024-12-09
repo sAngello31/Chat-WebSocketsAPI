@@ -1,12 +1,17 @@
 package models
 
 import (
+	"client_websockets/colors"
+	modeldata "client_websockets/model_data"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type MenuModel struct {
+	User     modeldata.User
+	Contacts []modeldata.User
+	Cursor   int
 }
 
 func InitMenuModel() MenuModel {
@@ -22,7 +27,9 @@ func (m MenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter":
-			return m, tea.Quit
+			return InitModel(), nil
+		case "esc":
+			return InitModel(), nil
 		}
 	}
 	return m, nil
@@ -31,5 +38,12 @@ func (m MenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m MenuModel) View() string {
 	var b strings.Builder
 	b.WriteString("Bienvenido: \n")
+	b.WriteString("Tu numero de contacto: #\n\n")
+	b.WriteString("Seleccione con quien quiere hablar:\n")
+
+	b.WriteRune('\n')
+	b.WriteString(colors.BlurStyle.Render("Presiona 'esc' para cerrar sesión"))
+	b.WriteRune('\n')
+	b.WriteString(colors.BlurStyle.Render("Presiona 'enter' para iniciar una conversación"))
 	return b.String()
 }
