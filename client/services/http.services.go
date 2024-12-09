@@ -12,13 +12,13 @@ import (
 
 // MEJORAR EL MANEJO DE ERRORES
 func Login(user *modeldata.UserLogin) (int, string) {
-	url_login := os.Getenv("URL_BACKEND") + "/auth/login"
-	app_type := "application/x-www-form-urlencoded"
+	client := &http.Client{}
 	formData := url.Values{
 		"username": {user.Username},
 		"password": {user.Password},
-	}
-	resp, err := http.Post(url_login, app_type, bytes.NewBufferString(formData.Encode()))
+	}.Encode()
+	req := makeAuthRequest("/auth/login", bytes.NewBufferString(formData))
+	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
