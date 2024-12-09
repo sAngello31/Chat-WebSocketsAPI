@@ -7,5 +7,5 @@ type UserLogin struct {
 
 type User struct {
 	Username      string `json:"Username"`
-	ContactNumber string `json:"ContactNumber"`
+	ContactNumber int    `json:"ContactNumber"`
 }

@@ -3,6 +3,8 @@ package models
 import (
 	"client_websockets/colors"
 	modeldata "client_websockets/model_data"
+	"client_websockets/services"
+	"strconv"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -15,7 +17,9 @@ type MenuModel struct {
 }
 
 func InitMenuModel() MenuModel {
-	return MenuModel{}
+	return MenuModel{
+		User: *services.GetUserData(),
+	}
 }
 
 func (m MenuModel) Init() tea.Cmd {
@@ -36,9 +40,10 @@ func (m MenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m MenuModel) View() string {
+	contact_number := strconv.Itoa(m.User.ContactNumber)
 	var b strings.Builder
-	b.WriteString("Bienvenido: \n")
-	b.WriteString("Tu numero de contacto: #\n\n")
+	b.WriteString("Bienvenido: " + m.User.Username + "\n")
+	b.WriteString("Tu numero de contacto: # " + contact_number + "\n\n")
 	b.WriteString("Seleccione con quien quiere hablar:\n")
 
 	b.WriteRune('\n')
