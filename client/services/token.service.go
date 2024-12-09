@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bufio"
 	"os"
 	"strconv"
 )
@@ -21,4 +22,20 @@ func SaveToken(token string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func GetToken() string {
+	pid := os.Getpid()
+	file_name := "tmp/token_" + strconv.Itoa(pid)
+	file, err := os.Open(file_name)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	if scanner.Scan() {
+		return scanner.Text()
+	}
+
+	return ""
 }
