@@ -15,6 +15,7 @@ type RegisterModel struct {
 	FocusIndex int
 	Inputs     []textinput.Model
 	BoolInputs []bool
+	IsWrong    bool
 }
 
 func InitRegisterModel() RegisterModel {
@@ -80,6 +81,9 @@ func (m RegisterModel) View() string {
 	b.WriteString("Registar Nuevo Usuario\n")
 	s := utilsmodel.PrintInputs(&m.Inputs, &m.BoolInputs)
 	b.WriteString(s)
+	if m.IsWrong {
+		b.WriteString(colors.ErrorStyle.Render("Error al registrar usuario"))
+	}
 	return b.String()
 }
 
@@ -106,6 +110,7 @@ func (m RegisterModel) enterRegister() tea.Model {
 	}
 	status := services.Register(&data)
 	if status != 200 {
+		m.IsWrong = true
 		return m
 	}
 	return InitModel()

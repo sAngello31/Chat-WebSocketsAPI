@@ -26,6 +26,7 @@ func PrintInputs(inputs *[]textinput.Model, bool_inputs *[]bool) string {
 	b.WriteString(colors.BlurStyle.Render("Presiona 'esc' para retroceder"))
 	b.WriteRune('\n')
 	b.WriteString(colors.BlurStyle.Render("Presiona 'enter' para aceptar"))
+	b.WriteRune('\n')
 	return b.String()
 }
 

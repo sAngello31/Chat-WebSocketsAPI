@@ -15,6 +15,7 @@ type LoginModel struct {
 	FocusIndex int
 	Inputs     []textinput.Model
 	BoolInputs []bool
+	IsWrong    bool
 }
 
 func InitLoginModel() LoginModel {
@@ -74,6 +75,9 @@ func (m LoginModel) View() string {
 	b.WriteString("Iniciar Sesión\n")
 	s := utilsmodel.PrintInputs(&m.Inputs, &m.BoolInputs)
 	b.WriteString(s)
+	if m.IsWrong {
+		b.WriteString(colors.ErrorStyle.Render("Error: user y/o contraseña incorrectos"))
+	}
 	return b.String()
 }
 
@@ -97,6 +101,7 @@ func (m LoginModel) enterLogin() tea.Model {
 	}
 	status, token := services.Login(&data)
 	if status != 200 {
+		m.IsWrong = true
 		return m
 	}
 	services.SaveToken(token)
