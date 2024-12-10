@@ -7,13 +7,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type MenuModel struct {
-	User     modeldata.User
-	Contacts []modeldata.User
-	Cursor   int
+	User   modeldata.User
+	List   list.Model
+	Cursor int
 }
 
 func InitMenuModel() MenuModel {

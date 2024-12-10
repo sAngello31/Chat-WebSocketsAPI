@@ -16,6 +16,7 @@ type RegisterModel struct {
 	Inputs     []textinput.Model
 	BoolInputs []bool
 	IsWrong    bool
+	StatusCode int
 }
 
 func InitRegisterModel() RegisterModel {
@@ -60,6 +61,9 @@ func (m RegisterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc":
 			return InitModel(), nil
 		case "enter":
+			if m.StatusCode == 200 {
+				return InitModel(), nil
+			}
 			return m.enterRegister(), nil
 		case "up", "down":
 			if m.FocusIndex > 0 && msg.String() == "up" {
@@ -77,6 +81,9 @@ func (m RegisterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m RegisterModel) View() string {
+	if m.StatusCode == 200 {
+		return getSuccessMsg()
+	}
 	var b strings.Builder
 	b.WriteString("Registar Nuevo Usuario\n")
 	s := utilsmodel.PrintInputs(&m.Inputs, &m.BoolInputs)
@@ -84,6 +91,14 @@ func (m RegisterModel) View() string {
 	if m.IsWrong {
 		b.WriteString(colors.ErrorStyle.Render("Error al registrar usuario"))
 	}
+	return b.String()
+}
+
+func getSuccessMsg() string {
+	var b strings.Builder
+	b.WriteString(colors.SuccesStyle.Render("Registro Éxitoso!"))
+	b.WriteRune('\n')
+	b.WriteString(colors.BlurStyle.Render("Presione 'enter' para continuar"))
 	return b.String()
 }
 
@@ -113,5 +128,6 @@ func (m RegisterModel) enterRegister() tea.Model {
 		m.IsWrong = true
 		return m
 	}
-	return InitModel()
+	m.StatusCode = status
+	return m
 }
