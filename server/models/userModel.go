@@ -11,10 +11,10 @@ import (
 )
 
 type User struct {
-	ID            primitive.ObjectID `bson:"_id,omitempty"`
-	ContactNumber int64              `bson:"contact_number"`
-	Username      string             `bson:"username"`
-	Password      string             `bson:"password"`
+	ID            primitive.ObjectID `bson:"_id,omitempty" json:"-"`
+	ContactNumber int64              `bson:"contact_number" json:"contact_number"`
+	Username      string             `bson:"username" json:"username"`
+	Password      string             `bson:"password" json:"-"`
 }
 
 type UserRepository struct {

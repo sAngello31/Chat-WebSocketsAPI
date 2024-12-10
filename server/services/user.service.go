@@ -77,7 +77,7 @@ func GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": userList})
+	c.JSON(http.StatusOK, userList)
 }
 
 func saveUser(user *models.User) (*mongo.InsertOneResult, error) {
