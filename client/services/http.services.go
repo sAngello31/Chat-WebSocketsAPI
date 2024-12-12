@@ -77,12 +77,28 @@ func GetUserData() *modeldata.User {
 
 }
 
-func GetAllUsers() {
-	x, err := http.Get("url" + "/user/getAll")
+func GetAllUsers() *[]modeldata.User {
+	var users []modeldata.User
+	client := &http.Client{}
+	url := os.Getenv("URL_BACKEND") + "/user/getAll"
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		panic("Error al hacer la peticion")
+		panic(err)
 	}
-	println(x)
+	makeHeader(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	if err = json.Unmarshal(body, &users); err != nil {
+		panic(err)
+	}
+	return &users
 }
 
 func makeAuthRequest(path string, data *bytes.Buffer) *http.Request {

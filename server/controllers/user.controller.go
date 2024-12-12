@@ -13,7 +13,7 @@ func GetAllUsers(c *gin.Context) {
 
 func GetUserData(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"Username":      c.Keys["username"],
-		"ContactNumber": c.Keys["contact_number"],
+		"username":       c.Keys["username"],
+		"contact_number": c.Keys["contact_number"],
 	})
 }
