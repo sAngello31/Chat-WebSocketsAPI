@@ -62,11 +62,21 @@ func (m MenuModel) View() string {
 		cursor := " "
 		if i == m.Cursor {
 			cursor = ">"
+			b.WriteString(colors.FocusedStyle.Render(cursor))
+			b.WriteString(colors.FocusedStyle.Render(" " + createLineMenu(&user)))
+		} else {
+			b.WriteString(cursor)
+			b.WriteString(" " + createLineMenu(&user))
 		}
-		b.WriteString(cursor)
-		b.WriteString(" " + user.Username + " - " + user.Description())
+
 		b.WriteRune('\n')
 	}
 	b.WriteRune('\n')
 	return b.String()
+}
+
+func createLineMenu(user *modeldata.User) string {
+	time_spaces := 10 - len(user.Title())
+	spaces := strings.Repeat(" ", time_spaces)
+	return user.Title() + spaces + " | " + user.Description()
 }
