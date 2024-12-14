@@ -31,7 +31,7 @@ func (m MenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter":
-			return InitModel(), nil
+			return InitChatModel(), nil
 		case "esc":
 			return InitModel(), nil
 		case "up":
