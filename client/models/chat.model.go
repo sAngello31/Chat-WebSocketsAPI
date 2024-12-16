@@ -2,12 +2,14 @@ package models
 
 import (
 	"client_websockets/colors"
+	"client_websockets/services"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gorilla/websocket"
 )
 
 var (
@@ -17,12 +19,13 @@ var (
 )
 
 type ChatModel struct {
+	Conn     *websocket.Conn
 	Viewport viewport.Model
 	TextArea textarea.Model
 	Message  []string
 }
 
-func InitChatModel() ChatModel {
+func InitChatModel(userA, userB string) ChatModel {
 	ta := textarea.New()
 	ta.Placeholder = "Enviar un mensaje..."
 	ta.Focus()
@@ -44,6 +47,7 @@ func InitChatModel() ChatModel {
 		Viewport: vp,
 		TextArea: ta,
 		Message:  []string{},
+		Conn:     services.ConnectChat(userA, userB),
 	}
 }
 
@@ -54,16 +58,20 @@ func (m ChatModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
+			m.Conn.Close()
 			return InitMenuModel(), nil
 		case "enter":
 			v := m.TextArea.Value()
 			if v == "" {
 				return m, nil
 			}
-			m.Message = append(m.Message, colors.FocusedStyle.Render("You: ")+v)
-			m.Viewport.SetContent(strings.Join(m.Message, "\n"))
-			m.TextArea.Reset()
-			m.Viewport.GotoBottom()
+			m.sendMsg(v)
+			/*
+				m.Message = append(m.Message, colors.FocusedStyle.Render("You: ")+v)
+				m.Viewport.SetContent(strings.Join(m.Message, "\n"))
+				m.TextArea.Reset()
+				m.Viewport.GotoBottom()
+			*/
 			return m, nil
 		default:
 			var cmd tea.Cmd
@@ -71,6 +79,7 @@ func (m ChatModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, cmd
 		}
 	}
+
 	return m, nil
 }
 
@@ -83,4 +92,12 @@ func (m ChatModel) View() string {
 	b.WriteRune('\n')
 	b.WriteByte('\n')
 	return b.String()
+}
+
+func (m *ChatModel) sendMsg(msg string) {
+	m.Message = append(m.Message, colors.FocusedStyle.Render("You: ")+msg)
+	m.Viewport.SetContent(strings.Join(m.Message, "\n"))
+	m.TextArea.Reset()
+	m.Viewport.GotoBottom()
+	m.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
 }

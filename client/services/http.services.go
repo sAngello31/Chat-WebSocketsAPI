@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/gorilla/websocket"
 )
 
-// MEJORAR EL MANEJO DE ERRORES
 func Login(user *modeldata.UserLogin) (int, string) {
 	client := &http.Client{}
 	formData := url.Values{
@@ -101,6 +102,20 @@ func GetAllUsers() *[]modeldata.User {
 	return &users
 }
 
+func ConnectChat(userA, userB string) *websocket.Conn {
+	url := os.Getenv("URL_CHAT") + GenerateUUID(userA, userB)
+	dialer := websocket.DefaultDialer
+	conn, _, err := dialer.Dial(url, *makeRealHeader())
+	if err != nil {
+		panic(err)
+	}
+	err = conn.WriteMessage(websocket.TextMessage, []byte("Nuevo Usuario se unió al chat"))
+	if err != nil {
+		panic(err)
+	}
+	return conn
+}
+
 func makeAuthRequest(path string, data *bytes.Buffer) *http.Request {
 	url := os.Getenv("URL_BACKEND") + path
 	req, err := http.NewRequest("POST", url, data)
@@ -117,4 +132,13 @@ func makeHeader(req *http.Request) {
 	req.Header.Set("User-Agent", "Go-TUI/1.0")
 	req.Header.Set("Authorization", token)
 	req.Header.Set("Accept", "application/json")
+}
+
+func makeRealHeader() *http.Header {
+	token := "Bearer " + GetToken()
+	header := http.Header{}
+	header.Set("User-Agent", "Go-TUI/1.0")
+	header.Set("Authorization", token)
+	header.Set("Accept", "application/json")
+	return &header
 }
