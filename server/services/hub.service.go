@@ -1,16 +1,15 @@
 package services
 
 import (
+	"chat_websocket/models"
 	"log"
-
-	"github.com/gorilla/websocket"
 )
 
 var hub *Hub
 
 type Hub struct {
 	Clients    map[*ChatClient]bool
-	Broadcast  chan []byte
+	Broadcast  chan models.Message
 	Register   chan *ChatClient
 	Unregister chan *ChatClient
 }
@@ -18,7 +17,7 @@ type Hub struct {
 func NewHub() *Hub {
 	return &Hub{
 		Clients:    make(map[*ChatClient]bool),
-		Broadcast:  make(chan []byte),
+		Broadcast:  make(chan models.Message),
 		Register:   make(chan *ChatClient),
 		Unregister: make(chan *ChatClient),
 	}
@@ -35,7 +34,7 @@ func (h *Hub) Run() {
 			client.Conn.Close()
 		case msg := <-h.Broadcast:
 			for client := range h.Clients {
-				err := client.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
+				err := client.Conn.WriteJSON(msg)
 				if err != nil {
 					log.Println("error: ", err)
 					h.Unregister <- client

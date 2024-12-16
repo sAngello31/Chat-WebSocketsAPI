@@ -1,7 +1,7 @@
 package services
 
 import (
-	"bytes"
+	"chat_websocket/models"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -11,7 +11,7 @@ type ChatClient struct {
 	Hub  *Hub
 	Conn *websocket.Conn
 	UUID string
-	Send chan []byte
+	Send chan models.Message
 }
 
 func NewClient(uuid string, conn *websocket.Conn) *ChatClient {
@@ -19,7 +19,7 @@ func NewClient(uuid string, conn *websocket.Conn) *ChatClient {
 		Hub:  GetHub(),
 		Conn: conn,
 		UUID: uuid,
-		Send: make(chan []byte),
+		Send: make(chan models.Message),
 	}
 	client.Hub.Register <- &client
 	return &client
@@ -29,12 +29,12 @@ func NewClient(uuid string, conn *websocket.Conn) *ChatClient {
 func (c *ChatClient) ReadMsg() {
 	defer c.CloseClient()
 	for {
-		_, msg, err := c.Conn.ReadMessage()
+		var msg models.Message
+		err := c.Conn.ReadJSON(&msg)
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		msg = bytes.TrimSpace(bytes.Replace(msg, []byte("\n"), []byte(" "), -1))
 		c.Hub.Broadcast <- msg
 	}
 }
