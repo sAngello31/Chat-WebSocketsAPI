@@ -78,5 +78,5 @@ func (m MenuModel) View() string {
 func createLineMenu(user *modeldata.User) string {
 	time_spaces := 10 - len(user.Title())
 	spaces := strings.Repeat(" ", time_spaces)
-	return user.Title() + spaces + " | " + user.Description()
+	return user.Title() + spaces + " ┃ " + user.Description()
 }

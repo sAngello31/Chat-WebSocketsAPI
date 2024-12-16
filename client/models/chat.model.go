@@ -66,12 +66,6 @@ func (m ChatModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.sendMsg(v)
-			/*
-				m.Message = append(m.Message, colors.FocusedStyle.Render("You: ")+v)
-				m.Viewport.SetContent(strings.Join(m.Message, "\n"))
-				m.TextArea.Reset()
-				m.Viewport.GotoBottom()
-			*/
 			return m, nil
 		default:
 			var cmd tea.Cmd
