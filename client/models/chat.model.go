@@ -2,6 +2,7 @@ package models
 
 import (
 	"client_websockets/colors"
+	modeldata "client_websockets/model_data"
 	"client_websockets/services"
 	"strings"
 
@@ -18,36 +19,34 @@ var (
 	heightViewport = 5
 )
 
+type Message struct {
+	from    string `json:"from"`
+	to      string `json:"to"`
+	content string `json:"content"`
+}
+
 type ChatModel struct {
 	Conn     *websocket.Conn
 	Viewport viewport.Model
 	TextArea textarea.Model
+	Users    map[string]*modeldata.User
 	Message  []string
 }
 
-func InitChatModel(userA, userB string) ChatModel {
-	ta := textarea.New()
-	ta.Placeholder = "Enviar un mensaje..."
-	ta.Focus()
-
-	ta.Prompt = "┃ "
-	ta.CharLimit = 280
-
-	ta.SetHeight(heightTextArea)
-	ta.SetWidth(width)
-
-	ta.FocusedStyle.CursorLine = lipgloss.NewStyle()
-	ta.ShowLineNumbers = false
-	ta.KeyMap.InsertNewline.SetEnabled(false)
-
+func InitChatModel(userA, userB *modeldata.User) ChatModel {
 	vp := viewport.New(width, heightViewport)
 	vp.SetContent("Se inicio un nuevo chat.")
 
+	users := make(map[string]*modeldata.User, 2)
+	users["To"] = userA
+	users["From"] = userB
+
 	return ChatModel{
 		Viewport: vp,
-		TextArea: ta,
+		TextArea: makeTextAreaModel(),
 		Message:  []string{},
-		Conn:     services.ConnectChat(userA, userB),
+		Users:    users,
+		Conn:     services.ConnectChat(userA.Username, userB.Username),
 	}
 }
 
@@ -88,10 +87,32 @@ func (m ChatModel) View() string {
 	return b.String()
 }
 
+func makeTextAreaModel() textarea.Model {
+	ta := textarea.New()
+	ta.Placeholder = "Enviar un mensaje..."
+	ta.Focus()
+
+	ta.Prompt = "┃ "
+	ta.CharLimit = 280
+
+	ta.SetHeight(heightTextArea)
+	ta.SetWidth(width)
+
+	ta.FocusedStyle.CursorLine = lipgloss.NewStyle()
+	ta.ShowLineNumbers = false
+	ta.KeyMap.InsertNewline.SetEnabled(false)
+	return ta
+}
+
 func (m *ChatModel) sendMsg(msg string) {
+	msgJSON := Message{
+		from:    m.Users["From"].Username,
+		to:      m.Users["To"].Username,
+		content: msg,
+	}
 	m.Message = append(m.Message, colors.FocusedStyle.Render("You: ")+msg)
 	m.Viewport.SetContent(strings.Join(m.Message, "\n"))
 	m.TextArea.Reset()
 	m.Viewport.GotoBottom()
-	m.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
+	m.Conn.WriteJSON(msgJSON)
 }
