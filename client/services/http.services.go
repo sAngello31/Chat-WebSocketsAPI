@@ -60,7 +60,7 @@ func GetUserData() *modeldata.User {
 	if err != nil {
 		panic(err)
 	}
-	makeHeader(req)
+	setHeader(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
@@ -86,7 +86,7 @@ func GetAllUsers() *[]modeldata.User {
 	if err != nil {
 		panic(err)
 	}
-	makeHeader(req)
+	setHeader(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
@@ -105,11 +105,7 @@ func GetAllUsers() *[]modeldata.User {
 func ConnectChat(userA, userB string) *websocket.Conn {
 	url := os.Getenv("URL_CHAT") + GenerateUUID(userA, userB)
 	dialer := websocket.DefaultDialer
-	conn, _, err := dialer.Dial(url, *makeRealHeader())
-	if err != nil {
-		panic(err)
-	}
-	err = conn.WriteMessage(websocket.TextMessage, []byte("Nuevo Usuario se unió al chat"))
+	conn, _, err := dialer.Dial(url, *makeHeader())
 	if err != nil {
 		panic(err)
 	}
@@ -127,18 +123,15 @@ func makeAuthRequest(path string, data *bytes.Buffer) *http.Request {
 	return req
 }
 
-func makeHeader(req *http.Request) {
-	token := "Bearer " + GetToken()
-	req.Header.Set("User-Agent", "Go-TUI/1.0")
-	req.Header.Set("Authorization", token)
-	req.Header.Set("Accept", "application/json")
-}
-
-func makeRealHeader() *http.Header {
+func makeHeader() *http.Header {
 	token := "Bearer " + GetToken()
 	header := http.Header{}
 	header.Set("User-Agent", "Go-TUI/1.0")
 	header.Set("Authorization", token)
 	header.Set("Accept", "application/json")
 	return &header
+}
+
+func setHeader(req *http.Request) {
+	req.Header = *makeHeader()
 }
