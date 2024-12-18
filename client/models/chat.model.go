@@ -20,9 +20,9 @@ var (
 )
 
 type Message struct {
-	from    string `json:"from"`
-	to      string `json:"to"`
-	content string `json:"content"`
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Content string `json:"content"`
 }
 
 type ChatModel struct {
@@ -38,8 +38,8 @@ func InitChatModel(userA, userB *modeldata.User) ChatModel {
 	vp.SetContent("Se inicio un nuevo chat.")
 
 	users := make(map[string]*modeldata.User, 2)
-	users["To"] = userA
-	users["From"] = userB
+	users["From"] = userA
+	users["To"] = userB
 
 	return ChatModel{
 		Viewport: vp,
@@ -50,7 +50,7 @@ func InitChatModel(userA, userB *modeldata.User) ChatModel {
 	}
 }
 
-func (m ChatModel) Init() tea.Cmd { return m.TextArea.Cursor.BlinkCmd() }
+func (m ChatModel) Init() tea.Cmd { return m.listenMessage() }
 
 func (m ChatModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -71,9 +71,11 @@ func (m ChatModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.TextArea, cmd = m.TextArea.Update(msg)
 			return m, cmd
 		}
+	case Message:
+		m.renderMsg(&msg)
 	}
 
-	return m, nil
+	return m, m.listenMessage()
 }
 
 func (m ChatModel) View() string {
@@ -104,15 +106,35 @@ func makeTextAreaModel() textarea.Model {
 	return ta
 }
 
-func (m *ChatModel) sendMsg(msg string) {
-	msgJSON := Message{
-		from:    m.Users["From"].Username,
-		to:      m.Users["To"].Username,
-		content: msg,
+func (m *ChatModel) renderMsg(msg *Message) {
+	var from_user string
+	if m.Users["From"].Username == msg.From {
+		from_user = "You: "
+	} else {
+		from_user = msg.From + ": "
 	}
-	m.Message = append(m.Message, colors.FocusedStyle.Render("You: ")+msg)
+	m.Message = append(m.Message, colors.FocusedStyle.Render(from_user)+msg.Content)
 	m.Viewport.SetContent(strings.Join(m.Message, "\n"))
 	m.TextArea.Reset()
 	m.Viewport.GotoBottom()
+}
+
+func (m *ChatModel) sendMsg(msg string) {
+	msgJSON := Message{
+		From:    m.Users["From"].Username,
+		To:      m.Users["To"].Username,
+		Content: msg,
+	}
 	m.Conn.WriteJSON(msgJSON)
+}
+
+func (m *ChatModel) listenMessage() tea.Cmd {
+	return func() tea.Msg {
+		var msg Message
+		err := m.Conn.ReadJSON(&msg)
+		if err != nil {
+			m.Conn.Close()
+		}
+		return msg
+	}
 }
