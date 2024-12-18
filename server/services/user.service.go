@@ -63,7 +63,7 @@ func LoginUser(c *gin.Context) {
 
 func GetAllUsers(c *gin.Context) {
 	collection := utils.GetCollection("users")
-	filter := bson.D{}
+	filter := bson.M{"username": bson.M{"$ne": c.Keys["username"]}}
 	var userList []models.User
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
