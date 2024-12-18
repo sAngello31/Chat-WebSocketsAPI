@@ -33,12 +33,18 @@ func (h *Hub) Run() {
 			delete(h.Clients, client)
 			client.Conn.Close()
 		case msg := <-h.Broadcast:
-			for client := range h.Clients {
-				err := client.Conn.WriteJSON(msg)
-				if err != nil {
-					log.Println("error: ", err)
-					h.Unregister <- client
-				}
+			h.sendMsg(&msg)
+		}
+	}
+}
+
+func (h *Hub) sendMsg(msg *models.Message) {
+	for client := range h.Clients {
+		if client.UUID == msg.UUID {
+			err := client.Conn.WriteJSON(msg)
+			if err != nil {
+				log.Println(err)
+				h.Unregister <- client
 			}
 		}
 	}

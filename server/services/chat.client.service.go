@@ -35,6 +35,7 @@ func (c *ChatClient) ReadMsg() {
 			log.Println(err)
 			break
 		}
+		msg.UUID = c.UUID
 		c.Hub.Broadcast <- msg
 	}
 }
