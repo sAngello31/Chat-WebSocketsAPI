@@ -14,4 +14,4 @@ This project is open to pull request and improvements by the community.
 ## Tools and Software
 - Golang - Programming Language
 - MongoDB - Database
-- BubbleTea - Library
+- BubbleTea - Library for TUI
