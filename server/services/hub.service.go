@@ -40,13 +40,17 @@ func (h *Hub) Run() {
 
 func (h *Hub) sendMsg(msg *models.Message) {
 	for client := range h.Clients {
-		if client.UUID == msg.UUID {
-			err := client.Conn.WriteJSON(msg)
-			if err != nil {
-				log.Println(err)
-				h.Unregister <- client
-			}
+		if client.UUID != msg.UUID {
+			continue
 		}
+		err := client.SendMsg(msg)
+		if err != nil {
+			log.Println(err)
+			h.Unregister <- client
+		}
+	}
+	if _, err := saveMsg(msg); err != nil {
+		log.Println(err)
 	}
 }
 

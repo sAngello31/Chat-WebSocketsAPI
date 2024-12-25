@@ -2,9 +2,12 @@ package services
 
 import (
 	"chat_websocket/models"
+	"chat_websocket/utils"
+	"context"
 	"log"
 
 	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ChatClient struct {
@@ -42,4 +45,17 @@ func (c *ChatClient) ReadMsg() {
 
 func (c *ChatClient) CloseClient() {
 	c.Hub.Unregister <- c
+}
+
+func (c *ChatClient) SendMsg(msg *models.Message) error {
+	err := c.Conn.WriteJSON(msg)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func saveMsg(msg *models.Message) (*mongo.InsertOneResult, error) {
+	collection := utils.GetCollection("chats")
+	return collection.InsertOne(context.TODO(), msg)
 }
