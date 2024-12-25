@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type User struct {
@@ -15,14 +14,6 @@ type User struct {
 	ContactNumber int64              `bson:"contact_number" json:"contact_number"`
 	Username      string             `bson:"username" json:"username"`
 	Password      string             `bson:"password" json:"-"`
-}
-
-type UserRepository struct {
-	client *mongo.Client
-}
-
-func NewUserRepository(client *mongo.Client) *UserRepository {
-	return &UserRepository{client: client}
 }
 
 func CreateUser(c *gin.Context, password string) User {
