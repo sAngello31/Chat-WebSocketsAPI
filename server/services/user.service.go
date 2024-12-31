@@ -16,8 +16,9 @@ import (
 func RegisterUser(c *gin.Context) {
 	validUsername := isUniqueUsername(c.PostForm("username"))
 	if !validUsername {
-		log.Println("Username is already taken")
-		c.JSON(http.StatusBadRequest, gin.H{"messge": "Username is already taken"})
+		msg := "Username is already taken"
+		log.Println(msg)
+		c.JSON(http.StatusBadRequest, gin.H{"messge": msg})
 		return
 	}
 	passwordHashed, err := bcrypt.GenerateFromPassword([]byte(c.PostForm("password")), bcrypt.DefaultCost)
