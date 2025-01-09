@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"chat_websocket/controllers"
 	"chat_websocket/services"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,7 @@ func SetupRoutes(router *gin.Engine) {
 
 	chat := router.Group("/chat")
 	{
-		chat.GET("/connectTo/:uuid", controllers.HandleConn)
+		chat.GET("/connectTo/:uuid", services.HandleConn)
 	}
 
 }
