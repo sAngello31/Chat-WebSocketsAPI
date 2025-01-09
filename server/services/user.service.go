@@ -31,6 +31,13 @@ func GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, userList)
 }
 
+func GetUserData(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"username":       c.Keys["username"],
+		"contact_number": c.Keys["contact_number"],
+	})
+}
+
 func saveUser(user *models.User) (*mongo.InsertOneResult, error) {
 	collection := utils.GetCollection("users")
 	result, err := collection.InsertOne(context.TODO(), user)

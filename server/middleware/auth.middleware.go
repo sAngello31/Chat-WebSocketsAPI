@@ -44,7 +44,7 @@ func JWTMiddleware(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	data := services.GetUserData(token)
+	data := services.GetUserDataFromJWT(token)
 	c.Set("user_id", data["user_id"])
 	c.Set("username", data["username"])
 	c.Set("contact_number", data["contact_number"])

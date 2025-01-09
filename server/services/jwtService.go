@@ -57,7 +57,7 @@ func GetNumericalDataFromJWT(token *jwt.Token, data string) float64 {
 	return 0
 }
 
-func GetUserData(token *jwt.Token) map[string]any {
+func GetUserDataFromJWT(token *jwt.Token) map[string]any {
 	data := make(map[string]any, 3)
 	data["user_id"] = GetStringDataFromJWT(token, "id")
 	data["username"] = GetStringDataFromJWT(token, "username")
