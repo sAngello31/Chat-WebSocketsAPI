@@ -9,9 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Falta integrarlo, se hará cuando se tenga internet xd
-
-func RUser(c *gin.Context) {
+func RegisterUser(c *gin.Context) {
 	validUsername := isUniqueUsername(c.PostForm("username"))
 	if !validUsername {
 		msg := "Username is already taken"
@@ -37,7 +35,7 @@ func RUser(c *gin.Context) {
 	})
 }
 
-func LUser(c *gin.Context) {
+func LoginUser(c *gin.Context) {
 	user, err := getUserByUsername(c.PostForm("username"))
 	if err != nil {
 		log.Println(err)

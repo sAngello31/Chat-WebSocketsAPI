@@ -10,57 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/crypto/bcrypt"
 )
-
-func RegisterUser(c *gin.Context) {
-	validUsername := isUniqueUsername(c.PostForm("username"))
-	if !validUsername {
-		msg := "Username is already taken"
-		log.Println(msg)
-		c.JSON(http.StatusBadRequest, gin.H{"messge": msg})
-		return
-	}
-	passwordHashed, err := bcrypt.GenerateFromPassword([]byte(c.PostForm("password")), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println("Error in hashing password")
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
-		return
-	}
-	newUser := models.CreateUser(c, string(passwordHashed))
-	result, err := saveUser(&newUser)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"StatusCode": http.StatusInternalServerError,
-			"Message":    "Internal Server Error",
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"StatusCode": http.StatusOK,
-		"InsertedID": result.InsertedID,
-	})
-}
-
-func LoginUser(c *gin.Context) {
-	user, err := getUserByUsername(c.PostForm("username"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(c.PostForm("password")))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
-		return
-	}
-	token, err := GenerateJWT(user)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"Access_Token": token})
-}
 
 func GetAllUsers(c *gin.Context) {
 	collection := utils.GetCollection("users")
